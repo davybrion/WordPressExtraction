@@ -1,5 +1,6 @@
 require "rexml/document"
 require "json"
+require "fileutils"
 
 def get_element_value(parent_element, element_name)
 	parent_element.get_elements(element_name)[0].text
@@ -27,6 +28,12 @@ def create_post_metadata(post_element)
 	post
 end
 
+def write_post_to_file(post_element, path)
+	File.open(path, "w") do |file|
+		file << get_element_value(post_element, "content:encoded")
+	end
+end
+
 if ARGV.length == 0
 	puts "you need to supply the path to the exported wordpress xml file!"
 	exit
@@ -39,8 +46,15 @@ xml = REXML::Document.new wp_data_file
 
 posts = []
 
+FileUtils.rm_r "output" if File.exists?("output")
+Dir.mkdir("output")
+
 xml.elements.each("rss/channel/item") do |post_element|
 	posts << create_post_metadata(post_element)
+	filename = posts[-1]['link'].chop.gsub("http://davybrion.com/blog/", "").gsub("/", "-")
+	write_post_to_file post_element, "output/#{filename}.md"
 end
 
-puts JSON.pretty_generate(posts)
+File.open("output/all_metadata.json", "w") do |file|
+	file << JSON.pretty_generate(posts)
+end
