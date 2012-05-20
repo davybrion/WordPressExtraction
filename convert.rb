@@ -1,10 +1,6 @@
 require "rexml/document"
 require "json"
 
-class PostMetadata
-	attr_accessor :title, :link, :pub_date, :categories
-end
-
 def get_element_value(parent_element, element_name)
 	parent_element.get_elements(element_name)[0].text
 end
