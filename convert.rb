@@ -11,12 +11,17 @@ def create_post_metadata(post_element)
 	post['link'] = get_element_value post_element, "link"
 	post['date'] = get_element_value post_element, "wp:post_date"
 
-	categories = []
+	dsq_meta_element = post_element.get_elements("wp:postmeta[wp:meta_key='dsq_thread_id']")[0]
+	if !dsq_meta_element.nil?
+		post['disqus_thread_id'] = dsq_meta_element.get_elements("wp:meta_value")[0].text
+	else
+		post['disqus_thread_id'] = ""
+	end
 
+	categories = []
 	post_element.elements.each("category") do |category_element|
 		categories << category_element.attributes.get_attribute("nicename").value()
 	end 
-
 	post['categories'] = categories
 
 	post
