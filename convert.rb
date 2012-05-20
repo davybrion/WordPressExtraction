@@ -13,7 +13,16 @@ def create_post_metadata(post_element)
 	post = Hash.new
 	post['title'] = get_element_value post_element, "title"
 	post['link'] = get_element_value post_element, "link"
-	post['pub_date'] = get_element_value post_element, "pubDate"
+	post['date'] = get_element_value post_element, "wp:post_date"
+
+	categories = []
+
+	post_element.elements.each("category") do |category_element|
+		categories << category_element.attributes.get_attribute("nicename").value()
+	end 
+
+	post['categories'] = categories
+
 	post
 end
 
